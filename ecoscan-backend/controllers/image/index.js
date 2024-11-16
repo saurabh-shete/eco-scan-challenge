@@ -47,8 +47,7 @@ export const analyzeImage = async (req, res) => {
         "items": [
           { "name": "T-shirt", "count": 2, "carbonFootprint": 7 },
           { "name": "Other", "count": 1, "carbonFootprint": 10 }
-        ],
-        "totalItems": 3
+        ]
       }
     `;
 
@@ -86,10 +85,18 @@ export const analyzeImage = async (req, res) => {
       }
     }
 
+    const items = parsedResult.items || [];
+    const totalItems = items.reduce((sum, item) => sum + item.count, 0);
+    const totalCarbonFootprint = items.reduce(
+      (sum, item) => sum + item.count * item.carbonFootprint,
+      0
+    );
+
     res.status(200).json({
       message: "Image analyzed successfully!",
-      items: parsedResult.items,
-      totalItems: parsedResult.totalItems,
+      items,
+      totalItems,
+      totalCarbonFootprint,
     });
   } catch (error) {
     console.error("Error analyzing image:", error);
