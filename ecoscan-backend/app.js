@@ -1,12 +1,15 @@
 import express from "express";
 import imageRouter from "./routes/image/index.js";
 import ecoScoreRouter from "./routes/eco_score/index.js";
+import offerRouter from "./routes/offers/index.js";
+
 const app = express();
 
 app.use(express.json());
 
 app.use("/api/images", imageRouter);
 app.use("/api/eco-score", ecoScoreRouter);
+app.use("/api/offers", offerRouter);
 
 app.get("/", (req, res) => res.send({ message: "EcoScan backend is running!" }));
 
