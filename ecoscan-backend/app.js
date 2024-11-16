@@ -1,13 +1,14 @@
-const express = require("express");
+import express from "express";
+import imageRouter from "./routes/image/index.js";
 
 const app = express();
 
-// GET route to check server status
-app.get("/", (req, res) => {
-  res.send({ message: "EcoScan backend is running!" });
-});
+app.use(express.json());
 
-// Start the server
+app.use("/api/images", imageRouter);
+
+app.get("/", (req, res) => res.send({ message: "EcoScan backend is running!" }));
+
 const PORT = 8000;
 app.listen(PORT, () => {
   console.log(`Backend is running on http://localhost:${PORT}`);
