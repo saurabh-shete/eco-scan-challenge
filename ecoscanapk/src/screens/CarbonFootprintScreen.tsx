@@ -5,21 +5,28 @@ import {
   StyleSheet,
   ActivityIndicator,
   ScrollView,
+  Image,
+  TouchableOpacity,
   Platform,
 } from 'react-native';
-import {BACKEND_URL} from '@env';
+import BACKEND_URL from '../config/index.js';
 
 const CarbonFootprintScreen: React.FC = ({route}: any) => {
   const {imageUri} = route.params;
   const [loading, setLoading] = useState<boolean>(true);
-  const [carbonFootprintData, setCarbonFootprintData] = useState<any | null>(null);
+  const [carbonFootprintData, setCarbonFootprintData] = useState<any | null>(
+    null,
+  );
 
   useEffect(() => {
     const analyzeImage = async () => {
       try {
         const formData = new FormData();
         formData.append('image', {
-          uri: Platform.OS === 'android' ? imageUri : imageUri.replace('file://', ''),
+          uri:
+            Platform.OS === 'android'
+              ? imageUri
+              : imageUri.replace('file://', ''),
           type: 'image/jpeg',
           name: 'clothing_item.jpg',
         });
@@ -54,20 +61,62 @@ const CarbonFootprintScreen: React.FC = ({route}: any) => {
       {loading ? (
         <ActivityIndicator size="large" color="green" />
       ) : (
-        <ScrollView>
-          <Text style={styles.resultTitle}>Carbon Footprint Analysis</Text>
-          {carbonFootprintData?.items.map((item: any, index: number) => (
-            <View key={index} style={styles.resultItem}>
-              <Text style={styles.resultText}>
-                {item.name} - Count: {item.count}, Carbon Footprint: {item.carbonFootprint} kg CO₂
+        <>
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>
+                Image Analyzed Successfully!
+              </Text>
+              <Text style={styles.totalCarbon}>
+                Total Carbon Footprint: {carbonFootprintData?.totalCarbonFootprint} kg CO₂
               </Text>
             </View>
-          ))}
-          <Text style={styles.resultTotal}>
-            Total Items: {carbonFootprintData?.totalItems}, Total Carbon Footprint:{' '}
-            {carbonFootprintData?.totalCarbonFootprint} kg CO₂
-          </Text>
-        </ScrollView>
+
+            {/* Dynamic Bar Chart */}
+            <View style={styles.chartContainer}>
+              <Text style={styles.chartText}>Carbon Distribution</Text>
+              <View style={styles.barChart}>
+                {carbonFootprintData?.items.map((item: any, index: number) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.bar,
+                      {
+                        height: item.carbonFootprint * 5, // Bar height based on carbon footprint
+                        backgroundColor:
+                          index % 2 === 0 ? '#8BC34A' : '#4CAF50',
+                      },
+                    ]}
+                  />
+                ))}
+              </View>
+            </View>
+
+            {/* Items List */}
+            <Text style={styles.sectionTitle}>Item Details</Text>
+            {carbonFootprintData?.items.map((item: any, index: number) => (
+              <View key={index} style={styles.card}>
+                <Image
+                  source={require('../assets/clothing-icon.png')} // Add a clothing icon
+                  style={styles.cardImage}
+                />
+                <View style={styles.cardContent}>
+                  <Text style={styles.cardTitle}>{item.name}</Text>
+                  <Text style={styles.cardText}>
+                    Count: {item.count}, Carbon: {item.carbonFootprint} kg CO₂
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+
+          {/* Next Button */}
+          <View style={styles.footer}>
+            <TouchableOpacity style={styles.nextButton}>
+              <Text style={styles.nextButtonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
+        </>
       )}
     </View>
   );
@@ -76,27 +125,107 @@ const CarbonFootprintScreen: React.FC = ({route}: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8F9FA',
   },
-  resultTitle: {
+  scrollContainer: {
+    padding: 16,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#388E3C',
+  },
+  totalCarbon: {
+    marginTop: 8,
     fontSize: 18,
+    fontWeight: '600',
+    color: '#FF5722',
+  },
+  chartContainer: {
+    width: '100%',
+    padding: 16,
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  chartText: {
+    textAlign: 'center',
+    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-    textAlign: 'center',
-    color: 'green',
+    color: '#4CAF50',
   },
-  resultItem: {
-    marginVertical: 5,
+  barChart: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-around',
+    height: 100,
+    backgroundColor: '#E8F5E9',
+    borderRadius: 8,
+    padding: 10,
   },
-  resultText: {
-    fontSize: 16,
+  bar: {
+    width: 20,
+    borderRadius: 4,
   },
-  resultTotal: {
-    marginTop: 10,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#388E3C',
+    marginBottom: 10,
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: {width: 0, height: 2},
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  cardImage: {
+    width: 40,
+    height: 40,
+    marginRight: 16,
+  },
+  cardContent: {
+    flex: 1,
+  },
+  cardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
+    color: '#4CAF50',
+  },
+  cardText: {
+    fontSize: 14,
+    color: '#757575',
+  },
+  footer: {
+    padding: 16,
+    backgroundColor: '#FFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+    alignItems: 'center',
+  },
+  nextButton: {
+    width: '80%',
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  nextButtonText: {
+    fontSize: 18,
+    color: '#FFF',
+    fontWeight: 'bold',
   },
 });
 
