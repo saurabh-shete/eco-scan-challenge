@@ -56,15 +56,7 @@ export const analyzeImage = async (req, res) => {
       messages: [
         {
           role: "user",
-          content: [
-            { type: "text", text: prompt },
-            {
-              type: "image_url",
-              image_url: {
-                url: dataUrl,
-              },
-            },
-          ],
+          content: prompt,
         },
       ],
     });
@@ -86,15 +78,33 @@ export const analyzeImage = async (req, res) => {
     }
 
     const items = parsedResult.items || [];
-    const totalItems = items.reduce((sum, item) => sum + item.count, 0);
-    const totalCarbonFootprint = items.reduce(
+
+    if (items.length === 0) {
+      return res.status(400).json({
+        message: "No clothing items detected in the image. Please try again.",
+      });
+    }
+
+    const formattedItems = items.map((item) => {
+      if (!carbonFootprintData[item.name]) {
+        return {
+          name: "Other",
+          count: item.count,
+          carbonFootprint: 10,
+        };
+      }
+      return item;
+    });
+
+    const totalItems = formattedItems.reduce((sum, item) => sum + item.count, 0);
+    const totalCarbonFootprint = formattedItems.reduce(
       (sum, item) => sum + item.count * item.carbonFootprint,
       0
     );
 
     res.status(200).json({
       message: "Image analyzed successfully!",
-      items,
+      items: formattedItems,
       totalItems,
       totalCarbonFootprint,
     });
@@ -107,3 +117,4 @@ export const analyzeImage = async (req, res) => {
     });
   }
 };
+

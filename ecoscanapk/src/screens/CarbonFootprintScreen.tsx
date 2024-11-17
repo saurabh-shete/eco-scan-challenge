@@ -1,29 +1,29 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ActivityIndicator,
   ScrollView,
-  Image,
-  TouchableOpacity,
+  Alert,
   Platform,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from '../../App';
-import BACKEND_URL from '../config/index.js';
+  TouchableOpacity,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../App";
+import BACKEND_URL from "../config/index.js";
 
 type CarbonFootprintScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'EcoScoreScreen'
+  "EcoScoreScreen"
 >;
 
-const CarbonFootprintScreen: React.FC = ({route}: any) => {
-  const {imageUri} = route.params;
+const CarbonFootprintScreen: React.FC = ({ route }: any) => {
+  const { imageUri } = route.params;
   const [loading, setLoading] = useState<boolean>(true);
   const [carbonFootprintData, setCarbonFootprintData] = useState<any | null>(
-    null,
+    null
   );
   const navigation = useNavigation<CarbonFootprintScreenNavigationProp>();
 
@@ -31,19 +31,19 @@ const CarbonFootprintScreen: React.FC = ({route}: any) => {
     const analyzeImage = async () => {
       try {
         const formData = new FormData();
-        formData.append('image', {
+        formData.append("image", {
           uri:
-            Platform.OS === 'android'
+            Platform.OS === "android"
               ? imageUri
-              : imageUri.replace('file://', ''),
-          type: 'image/jpeg',
-          name: 'clothing_item.jpg',
+              : imageUri.replace("file://", ""),
+          type: "image/jpeg",
+          name: "clothing_item.jpg",
         });
 
         const response = await fetch(`${BACKEND_URL}/api/images/analyze`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
           body: formData,
         });
@@ -53,10 +53,11 @@ const CarbonFootprintScreen: React.FC = ({route}: any) => {
         if (response.ok) {
           setCarbonFootprintData(result);
         } else {
-          console.error(result.message || 'Something went wrong.');
+          Alert.alert("Error", result.message || "Something went wrong.");
         }
       } catch (error) {
-        console.error('Error analyzing image:', error);
+        Alert.alert("Error", "Error analyzing the image. Please try again.");
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -69,7 +70,7 @@ const CarbonFootprintScreen: React.FC = ({route}: any) => {
     <View style={styles.container}>
       {loading ? (
         <ActivityIndicator size="large" color="green" />
-      ) : (
+      ) : carbonFootprintData ? (
         <>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.header}>
@@ -77,12 +78,11 @@ const CarbonFootprintScreen: React.FC = ({route}: any) => {
                 Image Analyzed Successfully!
               </Text>
               <Text style={styles.totalCarbon}>
-                Total Carbon Footprint:{' '}
+                Total Carbon Footprint:{" "}
                 {carbonFootprintData?.totalCarbonFootprint} kg CO₂
               </Text>
             </View>
 
-            {/* Dynamic Bar Chart */}
             <View style={styles.chartContainer}>
               <Text style={styles.chartText}>Carbon Distribution</Text>
               <View style={styles.barChart}>
@@ -92,9 +92,9 @@ const CarbonFootprintScreen: React.FC = ({route}: any) => {
                     style={[
                       styles.bar,
                       {
-                        height: item.carbonFootprint * 5, // Bar height based on carbon footprint
+                        height: item.carbonFootprint * 5,
                         backgroundColor:
-                          index % 2 === 0 ? '#8BC34A' : '#4CAF50',
+                          item.name === "Other" ? "#FFB74D" : "#4CAF50",
                       },
                     ]}
                   />
@@ -102,43 +102,36 @@ const CarbonFootprintScreen: React.FC = ({route}: any) => {
               </View>
             </View>
 
-            {/* Items List */}
             <Text style={styles.sectionTitle}>Item Details</Text>
             {carbonFootprintData?.items.map((item: any, index: number) => (
               <View key={index} style={styles.card}>
-                <Image
-                  source={require('../assets/clothing-icon.png')} // Add a clothing icon
-                  style={styles.cardImage}
-                />
-                <View style={styles.cardContent}>
-                  <Text style={styles.cardTitle}>{item.name}</Text>
-                  <Text style={styles.cardText}>
-                    Count: {item.count}, Carbon: {item.carbonFootprint} kg CO₂
-                  </Text>
-                </View>
+                <Text style={styles.cardTitle}>{item.name}</Text>
+                <Text style={styles.cardText}>
+                  Count: {item.count}, Carbon: {item.carbonFootprint} kg CO₂
+                </Text>
               </View>
             ))}
           </ScrollView>
-
-          {/* Next Button */}
-          <View style={styles.footer}>
-            <TouchableOpacity
-              style={styles.nextButton}
-              onPress={() =>
-                navigation.navigate('EcoScoreScreen', {
-                  totalCarbonFootprint:
-                    carbonFootprintData.totalCarbonFootprint,
-                })
-              }>
-              <Text style={styles.nextButtonText}>Next</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.nextButton}
+            onPress={() =>
+              navigation.navigate("EcoScoreScreen", {
+                totalCarbonFootprint:
+                  carbonFootprintData?.totalCarbonFootprint || 0,
+              })
+            }
+          >
+            <Text style={styles.nextButtonText}>Next</Text>
+          </TouchableOpacity>
         </>
+      ) : (
+        <Text style={styles.errorText}>
+          No clothing items detected. Please try again.
+        </Text>
       )}
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -244,6 +237,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#FFF',
     fontWeight: 'bold',
+  },
+  errorText: {
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#FF5722", 
+    marginTop: 20,
+    paddingHorizontal: 16, 
   },
 });
 
