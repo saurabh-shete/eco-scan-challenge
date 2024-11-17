@@ -8,9 +8,9 @@ EcoScan is a mobile application designed to help users understand the environmen
 
 ## 🔧 Tech Stack
 
-- **Frontend**: React Native (Expo or CLI)
-- **Backend**: Node.js with Express (or your preferred backend framework)
-- **Image Recognition**: GPT-4 Vision API (or mock function for development)
+- **Frontend**: React Native (CLI)
+- **Backend**: Node.js with Express 
+- **Image Recognition**: GPT-4 Vision API
 - **Deployment**: Render
 
 ---
