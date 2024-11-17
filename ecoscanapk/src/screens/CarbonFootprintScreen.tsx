@@ -69,20 +69,19 @@ const CarbonFootprintScreen: React.FC = ({ route }: any) => {
   return (
     <View style={styles.container}>
       {loading ? (
-        <ActivityIndicator size="large" color="green" />
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color="green" />
+        </View>
       ) : carbonFootprintData ? (
         <>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.header}>
-              <Text style={styles.headerText}>
-                Image Analyzed Successfully!
-              </Text>
+              <Text style={styles.headerText}>Image Analyzed Successfully!</Text>
               <Text style={styles.totalCarbon}>
-                Total Carbon Footprint:{" "}
-                {carbonFootprintData?.totalCarbonFootprint} kg CO₂
+                Total Carbon Footprint: {carbonFootprintData?.totalCarbonFootprint} kg CO₂
               </Text>
             </View>
-
+  
             <View style={styles.chartContainer}>
               <Text style={styles.chartText}>Carbon Distribution</Text>
               <View style={styles.barChart}>
@@ -93,15 +92,14 @@ const CarbonFootprintScreen: React.FC = ({ route }: any) => {
                       styles.bar,
                       {
                         height: item.carbonFootprint * 5,
-                        backgroundColor:
-                          item.name === "Other" ? "#FFB74D" : "#4CAF50",
+                        backgroundColor: item.name === "Other" ? "#FFB74D" : "#4CAF50",
                       },
                     ]}
                   />
                 ))}
               </View>
             </View>
-
+  
             <Text style={styles.sectionTitle}>Item Details</Text>
             {carbonFootprintData?.items.map((item: any, index: number) => (
               <View key={index} style={styles.card}>
@@ -112,25 +110,28 @@ const CarbonFootprintScreen: React.FC = ({ route }: any) => {
               </View>
             ))}
           </ScrollView>
-          <TouchableOpacity
-            style={styles.nextButton}
-            onPress={() =>
-              navigation.navigate("EcoScoreScreen", {
-                totalCarbonFootprint:
-                  carbonFootprintData?.totalCarbonFootprint || 0,
-              })
-            }
-          >
-            <Text style={styles.nextButtonText}>Next</Text>
-          </TouchableOpacity>
+          <View style={styles.footer}>
+            <TouchableOpacity
+              style={styles.nextButton}
+              onPress={() =>
+                navigation.navigate("EcoScoreScreen", {
+                  totalCarbonFootprint: carbonFootprintData?.totalCarbonFootprint || 0,
+                })
+              }
+            >
+              <Text style={styles.nextButtonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
         </>
       ) : (
-        <Text style={styles.errorText}>
-          No clothing items detected. Please try again.
-        </Text>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>No clothing items detected. Please try again.</Text>
+        </View>
       )}
     </View>
   );
+  
+  
 };
 const styles = StyleSheet.create({
   container: {
@@ -220,23 +221,27 @@ const styles = StyleSheet.create({
     color: '#757575',
   },
   footer: {
-    padding: 16,
-    backgroundColor: '#FFF',
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "#FFF",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-    alignItems: 'center',
+    borderTopColor: "#E0E0E0",
+    alignItems: "center",
   },
   nextButton: {
-    width: '80%',
-    backgroundColor: '#4CAF50',
+    width: "80%",
+    backgroundColor: "#4CAF50",
     paddingVertical: 12,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   nextButtonText: {
     fontSize: 18,
-    color: '#FFF',
-    fontWeight: 'bold',
+    color: "#FFF",
+    fontWeight: "bold",
   },
   errorText: {
     textAlign: "center",
@@ -245,7 +250,20 @@ const styles = StyleSheet.create({
     color: "#FF5722", 
     marginTop: 20,
     paddingHorizontal: 16, 
+    
   },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 16,
+  },
+  
 });
 
 export default CarbonFootprintScreen;
