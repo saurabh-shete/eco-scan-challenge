@@ -7,14 +7,23 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../../App';
 import BACKEND_URL from '../config/index.js';
 
+type UploadScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'EcoScoreScreen'
+>;
 const EcoScoreScreen: React.FC = ({route}: any) => {
-    const {totalCarbonFootprint} = route.params;
+  const {totalCarbonFootprint} = route.params;
   const [ecoRewardPoints, setEcoRewardPoints] = useState<number | null>(null);
   const [offers, setOffers] = useState<any[]>([]);
   const [loadingEcoScore, setLoadingEcoScore] = useState<boolean>(true);
   const [loadingOffers, setLoadingOffers] = useState<boolean>(false);
+  const navigation = useNavigation<UploadScreenNavigationProp>();
+
 
   // Fetch Eco-Score on Component Mount
   useEffect(() => {
@@ -109,6 +118,13 @@ const EcoScoreScreen: React.FC = ({route}: any) => {
               ))}
             </View>
           )}
+
+          {/* Go Back Button */}
+          <TouchableOpacity
+            style={styles.goBackButton}
+            onPress={() => navigation.navigate('UploadScreen')}>
+            <Text style={styles.buttonText}>Go Back to Upload Screen</Text>
+          </TouchableOpacity>
         </ScrollView>
       )}
     </View>
@@ -119,6 +135,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',
+    paddingBottom: 10,
   },
   scrollContainer: {
     padding: 16,
@@ -146,6 +163,13 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  goBackButton: {
+    backgroundColor: '#2196F3',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',

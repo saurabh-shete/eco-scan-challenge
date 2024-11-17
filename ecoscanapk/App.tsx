@@ -25,7 +25,11 @@ const App: React.FC = () => {
         <Stack.Screen
           name="UploadScreen"
           component={UploadScreen}
-          options={{title: 'EcoScan'}}
+          options={{
+            title: 'EcoScan',
+            headerLeft: () => null, // Removes the back arrow
+            gestureEnabled: false, // Prevents swipe-back gestures
+          }}
         />
         <Stack.Screen
           name="CarbonFootprintScreen"
@@ -35,7 +39,7 @@ const App: React.FC = () => {
         <Stack.Screen
           name="EcoScoreScreen"
           component={EcoScoreScreen}
-          options={{headerTitle: 'Eco-Score & Offers'}}
+          options={{title: 'Eco-Score & Offers'}}
         />
       </Stack.Navigator>
     </NavigationContainer>
