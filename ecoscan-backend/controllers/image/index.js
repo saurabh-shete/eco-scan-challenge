@@ -1,8 +1,4 @@
-import fs from "fs";
-import { promisify } from "util";
 import openai from "../../connections/openaiClient.js";
-
-const unlinkAsync = promisify(fs.unlink);
 
 const carbonFootprintData = {
   "T-shirt": 7,
@@ -30,17 +26,23 @@ const carbonFootprintData = {
 
 export const analyzeImage = async (req, res) => {
   try {
-    const imagePath = req.file.path;
+    console.log("Analyzing image...");
 
-    const base64Image = fs.readFileSync(imagePath, { encoding: "base64" });
-    const dataUrl = `data:image/jpeg;base64,${base64Image}`;
+    if (!req.file || !req.file.buffer) {
+      throw new Error("No file provided or file is not in memory.");
+    }
+
+    const base64Image = req.file.buffer.toString("base64");
+    const dataUrl = `data:${req.file.mimetype};base64,${base64Image}`;
 
     const prompt = `
       You are analyzing an image of clothing items. Map the detected clothing items to the closest match in the following carbon footprint data:
-      
+
       ${JSON.stringify(carbonFootprintData, null, 2)}
 
-      If an item doesn't match any category, classify it as "Other" and assign a generic carbon footprint of 10 kg CO₂.
+      If the item is not an image, throw an error.
+
+      If an item, which is a cloth, doesn't match any cloth in the category, classify it as "Other" and assign a generic carbon footprint of 10 kg CO₂.
 
       Provide the result in JSON format like this:
       {
@@ -56,12 +58,16 @@ export const analyzeImage = async (req, res) => {
       messages: [
         {
           role: "user",
-          content: prompt,
+          content: [
+            { type: "text", text: prompt },
+            {
+              type: "image_url",
+              image_url: { url: dataUrl },
+            },
+          ],
         },
       ],
     });
-
-    await unlinkAsync(imagePath);
 
     const rawResult = response.choices[0].message.content;
     let parsedResult;
@@ -78,33 +84,15 @@ export const analyzeImage = async (req, res) => {
     }
 
     const items = parsedResult.items || [];
-
-    if (items.length === 0) {
-      return res.status(400).json({
-        message: "No clothing items detected in the image. Please try again.",
-      });
-    }
-
-    const formattedItems = items.map((item) => {
-      if (!carbonFootprintData[item.name]) {
-        return {
-          name: "Other",
-          count: item.count,
-          carbonFootprint: 10,
-        };
-      }
-      return item;
-    });
-
-    const totalItems = formattedItems.reduce((sum, item) => sum + item.count, 0);
-    const totalCarbonFootprint = formattedItems.reduce(
+    const totalItems = items.reduce((sum, item) => sum + item.count, 0);
+    const totalCarbonFootprint = items.reduce(
       (sum, item) => sum + item.count * item.carbonFootprint,
       0
     );
 
     res.status(200).json({
       message: "Image analyzed successfully!",
-      items: formattedItems,
+      items,
       totalItems,
       totalCarbonFootprint,
     });
@@ -117,4 +105,3 @@ export const analyzeImage = async (req, res) => {
     });
   }
 };
-

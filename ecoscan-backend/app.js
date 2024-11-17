@@ -19,12 +19,11 @@ app.get("/", (req, res) =>
 const PORT = 8000;
 app.listen(PORT, () => {
   console.log(`Backend is running on http://localhost:${PORT}`);
-  // Start self-pinging after the server starts
   startSelfPinging();
 });
 
 function startSelfPinging() {
-  const PING_INTERVAL = 14 * 60 * 1000; // 14 minutes in milliseconds
+  const PING_INTERVAL = 14 * 60 * 1000;
   const PING_URL = `https://eco-scan-challenge-bgwb.onrender.com`;
   const env = process.env.NODE_ENV;
   if (env === "production") {
