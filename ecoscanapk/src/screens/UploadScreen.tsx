@@ -76,10 +76,13 @@ const UploadScreen: React.FC = () => {
             <Text style={styles.iconText}>Take Photo</Text>
           </TouchableOpacity>
         </View>
+        
+      </View>
+      <View style={styles.footer}>
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
-      </View>
+        </View>
     </View>
   );
 };
@@ -133,16 +136,23 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   nextButton: {
-    backgroundColor: 'green',
-    paddingVertical: 10,
-    paddingHorizontal: 40,
+    width: '80%',
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
     borderRadius: 8,
-    alignSelf: 'center',
+    alignItems: 'center',
   },
   nextButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
+    color: '#FFF',
     fontWeight: 'bold',
+  },
+  footer: {
+    padding: 16,
+    backgroundColor: '#FFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+    alignItems: 'center',
   },
 });
 
