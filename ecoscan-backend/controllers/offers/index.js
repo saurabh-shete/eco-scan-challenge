@@ -10,13 +10,18 @@ export const getTopOffers = (req, res) => {
       });
     }
 
-    // Filter offers that the user can redeem
     let matchingOffers = offers.filter((offer) => offer.points <= ecoRewardPoints);
 
-    // If no matching offers, provide lowest-point offers as a fallback
-    if (matchingOffers.length === 0) {
-      matchingOffers = offers.sort((a, b) => a.points - b.points).slice(0, 5);
+    if (matchingOffers.length < 5) {
+      const remainingOffers = offers
+        .filter((offer) => !matchingOffers.includes(offer)) 
+        .sort((a, b) => a.points - b.points) 
+        .slice(0, 5 - matchingOffers.length);
+
+      matchingOffers = [...matchingOffers, ...remainingOffers];
     }
+
+    matchingOffers = matchingOffers.slice(0, 6);
 
     res.status(200).json({
       message: "Top offers fetched successfully!",
