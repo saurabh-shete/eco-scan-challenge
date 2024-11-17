@@ -9,7 +9,15 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../../App';
 import BACKEND_URL from '../config/index.js';
+
+type CarbonFootprintScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'EcoScoreScreen'
+>;
 
 const CarbonFootprintScreen: React.FC = ({route}: any) => {
   const {imageUri} = route.params;
@@ -17,6 +25,7 @@ const CarbonFootprintScreen: React.FC = ({route}: any) => {
   const [carbonFootprintData, setCarbonFootprintData] = useState<any | null>(
     null,
   );
+  const navigation = useNavigation<CarbonFootprintScreenNavigationProp>();
 
   useEffect(() => {
     const analyzeImage = async () => {
@@ -68,7 +77,8 @@ const CarbonFootprintScreen: React.FC = ({route}: any) => {
                 Image Analyzed Successfully!
               </Text>
               <Text style={styles.totalCarbon}>
-                Total Carbon Footprint: {carbonFootprintData?.totalCarbonFootprint} kg CO₂
+                Total Carbon Footprint:{' '}
+                {carbonFootprintData?.totalCarbonFootprint} kg CO₂
               </Text>
             </View>
 
@@ -112,7 +122,14 @@ const CarbonFootprintScreen: React.FC = ({route}: any) => {
 
           {/* Next Button */}
           <View style={styles.footer}>
-            <TouchableOpacity style={styles.nextButton}>
+            <TouchableOpacity
+              style={styles.nextButton}
+              onPress={() =>
+                navigation.navigate('EcoScoreScreen', {
+                  totalCarbonFootprint:
+                    carbonFootprintData.totalCarbonFootprint,
+                })
+              }>
               <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
           </View>
@@ -143,7 +160,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 18,
     fontWeight: '600',
-    color: '#FF5722',
+    color: '#FFB74D',
   },
   chartContainer: {
     width: '100%',

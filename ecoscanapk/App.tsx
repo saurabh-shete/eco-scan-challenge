@@ -3,10 +3,12 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import UploadScreen from './src/screens/UploadScreen';
 import CarbonFootprintScreen from './src/screens/CarbonFootprintScreen';
+import EcoScoreScreen from './src/screens/EcoScoreScreen';
 
 export type RootStackParamList = {
-  UploadScreen: undefined; 
-  CarbonFootprintScreen: {imageUri: string}; 
+  UploadScreen: undefined;
+  CarbonFootprintScreen: {imageUri: string};
+  EcoScoreScreen: {totalCarbonFootprint: number};
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -29,6 +31,11 @@ const App: React.FC = () => {
           name="CarbonFootprintScreen"
           component={CarbonFootprintScreen}
           options={{title: 'Carbon Footprint Analysis'}}
+        />
+        <Stack.Screen
+          name="EcoScoreScreen"
+          component={EcoScoreScreen}
+          options={{headerTitle: 'Eco-Score & Offers'}}
         />
       </Stack.Navigator>
     </NavigationContainer>
