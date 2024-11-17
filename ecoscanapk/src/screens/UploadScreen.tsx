@@ -47,13 +47,22 @@ const UploadScreen: React.FC = () => {
     navigation.navigate('CarbonFootprintScreen', {imageUri});
   };
 
+  const handleClearImage = () => {
+    setImageUri(null);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Upload your Clothing Item</Text>
 
       <View style={styles.contentContainer}>
         {imageUri ? (
-          <Image source={{uri: imageUri}} style={styles.image} />
+          <>
+            <Image source={{uri: imageUri}} style={styles.image} />
+            <TouchableOpacity style={styles.clearButton} onPress={handleClearImage}>
+              <Text style={styles.clearButtonText}>Clear Image</Text>
+            </TouchableOpacity>
+          </>
         ) : (
           <Text style={styles.placeholder}>No image selected</Text>
         )}
@@ -76,13 +85,13 @@ const UploadScreen: React.FC = () => {
             <Text style={styles.iconText}>Take Photo</Text>
           </TouchableOpacity>
         </View>
-        
       </View>
+
       <View style={styles.footer}>
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
-        </View>
+      </View>
     </View>
   );
 };
@@ -108,6 +117,7 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     borderRadius: 10,
+    marginBottom: 10,
   },
   placeholder: {
     fontSize: 16,
@@ -153,6 +163,18 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
     alignItems: 'center',
+  },
+  clearButton: {
+    marginTop: 10,
+    backgroundColor: '#FF5722',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  clearButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
 
